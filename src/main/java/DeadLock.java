@@ -8,7 +8,7 @@ public class DeadLock {
 		START, THREAD1_HOLDS_RESOURCE1, THREAD1_HOLDS_RESOURCE1__AND__THREAD2_HOLDS_RESOURCE2
 	}
 
-	private DeadLockPreconditionStateMachineState _preconditionState = DeadLockPreconditionStateMachineState.START;
+	private transient DeadLockPreconditionStateMachineState _preconditionState = DeadLockPreconditionStateMachineState.START;
 	private final String _resource1 = "RESOURCE1";
 	private final String _resource2 = "RESOURCE2";
 
