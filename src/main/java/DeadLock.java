@@ -5,22 +5,22 @@ public class DeadLock {
 	 * States to go through to reproduce the deadlock precondition.
 	 */
 	private enum DeadLockPreconditionStateMachineState {
-		START, THREAD1_HOLDS_RESOURCE1, THREAD1_HOLDS_RESOURCE1__AND__THREAD2_HOLDS_RESOURCE2
+		NO_LOCKS, THREAD1_LOCKS_RESOURCE1, THREAD1_LOCKS_RESOURCE1__AND__THREAD2_LOCKS_RESOURCE2
 	}
 
-	private transient DeadLockPreconditionStateMachineState _preconditionState = DeadLockPreconditionStateMachineState.START;
+	private transient DeadLockPreconditionStateMachineState _preconditionState = DeadLockPreconditionStateMachineState.NO_LOCKS;
 	private final String _resource1 = "RESOURCE1";
 	private final String _resource2 = "RESOURCE2";
 
 	private final Thread _thread1 = new Thread("Thread1") {
 		public void run() {
-			if (_preconditionState != DeadLockPreconditionStateMachineState.START) {
+			if (_preconditionState != DeadLockPreconditionStateMachineState.NO_LOCKS) {
 				logBadStateError(this.getName(), _preconditionState);
 				return;
 			}
 			synchronized (_resource1) {
-				_preconditionState = DeadLockPreconditionStateMachineState.THREAD1_HOLDS_RESOURCE1;
-				while (_preconditionState != DeadLockPreconditionStateMachineState.THREAD1_HOLDS_RESOURCE1__AND__THREAD2_HOLDS_RESOURCE2) {
+				_preconditionState = DeadLockPreconditionStateMachineState.THREAD1_LOCKS_RESOURCE1;
+				while (_preconditionState != DeadLockPreconditionStateMachineState.THREAD1_LOCKS_RESOURCE1__AND__THREAD2_LOCKS_RESOURCE2) {
 					logBadStateError(this.getName(), _preconditionState);
 				}
 				synchronized (_resource2) {
@@ -33,11 +33,11 @@ public class DeadLock {
 
 	private final Thread _thread2 = new Thread("Thread2") {
 		public void run() {
-			while (_preconditionState != DeadLockPreconditionStateMachineState.THREAD1_HOLDS_RESOURCE1) {
+			while (_preconditionState != DeadLockPreconditionStateMachineState.THREAD1_LOCKS_RESOURCE1) {
 				logBadStateError(this.getName(), _preconditionState);
 			}
 			synchronized (_resource2) {
-				_preconditionState = DeadLockPreconditionStateMachineState.THREAD1_HOLDS_RESOURCE1__AND__THREAD2_HOLDS_RESOURCE2;
+				_preconditionState = DeadLockPreconditionStateMachineState.THREAD1_LOCKS_RESOURCE1__AND__THREAD2_LOCKS_RESOURCE2;
 				synchronized (_resource1) {
 					logBothResourcesAquired(this.getName());
 				}
